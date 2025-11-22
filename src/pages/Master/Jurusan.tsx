@@ -29,7 +29,7 @@ export default function Jurusan() {
         setLoading(true);
         setError(null);
         try {
-            const res = await api.get("/major");
+            const res = await api.get("/major/");
             setMajors(res.data.data || []);
         } catch (err: any) {
             console.error(err);
@@ -115,13 +115,14 @@ export default function Jurusan() {
 
     return (
         <AdminLayout title="Jurusan">
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white rounded-xl shadow-sm p-6 mb-6">
-                <div className="mb-4 lg:mb-0">
+            <div className="flex flex-col lg:flex-row justify-between lg:items-center bg-white rounded-xl shadow-sm p-6 mb-6 gap-4">
+                <div>
                     <h1 className="text-2xl font-bold text-gray-800">Kelola Jurusan</h1>
                     <p className="text-gray-600">Daftar jurusan yang tersedia di sistem</p>
                     {error && <p className="text-red-500 mt-1">{error}</p>}
                 </div>
-                <div className="text-gray-700 text-right text-sm lg:text-base flex flex-col">
+
+                <div className="text-gray-700 text-sm lg:text-base flex flex-col text-left lg:text-right">
                     <span className="font-medium text-2xl text-blue-700">{majors.length}</span>
                     <span>Jurusan tersedia</span>
                 </div>

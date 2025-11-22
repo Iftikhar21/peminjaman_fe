@@ -67,7 +67,7 @@ const AdminHeader = ({ title, onMenuToggle }: AdminHeaderProps) => {
                     {/* Dropdown */}
                     {profileOpen && (
                         <div id="profileDropdown" className="absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
-                            <Link to="/profile" className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                            <Link to="/admin/profil" className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                 <User className="w-4 h-4" />
                                 <span>Profile</span>
                             </Link>

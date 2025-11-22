@@ -40,7 +40,7 @@ export default function User() {
     // Ambil roles
     const fetchRoles = async () => {
         try {
-            const res = await api.get("/role");
+            const res = await api.get("/role/");
             console.log("Roles API full response:", res.data);
             setRoles(res.data.data || []); // <--- sesuaikan dengan API
         } catch (err) {
@@ -53,7 +53,7 @@ export default function User() {
         setLoading(true);
         setError(null);
         try {
-            const res = await api.get("/user");
+            const res = await api.get("/user/");
             setUsers(res.data.user || []);
         } catch (err: any) {
             console.error(err);
@@ -149,13 +149,14 @@ export default function User() {
     return (
         <AdminLayout title="User">
             {/* Header */}
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white rounded-xl shadow-sm p-6 mb-6">
-                <div className="mb-4 lg:mb-0">
-                    <h1 className="text-2xl font-bold text-gray-800">Kelola User (Admin)</h1>
-                    <p className="text-gray-600">Daftar user admin yang tersedia di sistem</p>
+            <div className="flex flex-col lg:flex-row justify-between lg:items-center bg-white rounded-xl shadow-sm p-6 mb-6 gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-800">Kelola User</h1>
+                    <p className="text-gray-600">Daftar User yang tersedia di sistem</p>
                     {error && <p className="text-red-500 mt-1">{error}</p>}
                 </div>
-                <div className="text-gray-700 text-right text-sm lg:text-base flex flex-col">
+
+                <div className="text-gray-700 text-sm lg:text-base flex flex-col text-left lg:text-right">
                     <span className="font-medium text-2xl text-blue-700">{users.length}</span>
                     <span>User tersedia</span>
                 </div>

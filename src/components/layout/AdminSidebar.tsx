@@ -111,7 +111,7 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
                 <div className="p-6 border-b border-slate-800 flex-shrink-0">
                     <div className="w-40 h-40 mx-auto flex items-center justify-center">
                         <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
-                            <span className="text-slate-900 text-2xl font-bold">TPA</span>
+                            <span className="text-slate-900 text-2xl font-bold">Admin</span>
                         </div>
                     </div>
                 </div>

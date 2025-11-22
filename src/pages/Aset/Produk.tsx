@@ -38,7 +38,7 @@ export default function Produk() {
     // Fetch categories
     const fetchCategories = async () => {
         try {
-            const res = await api.get("/categories");
+            const res = await api.get("/categories/");
             setCategories(res.data.data || []);
         } catch (err) {
             console.error(err);
@@ -50,7 +50,7 @@ export default function Produk() {
         setLoading(true);
         setError(null);
         try {
-            const res = await api.get("/product");
+            const res = await api.get("/product/");
             setProducts(res.data.data || []);
         } catch (err: any) {
             console.error(err);
@@ -141,13 +141,14 @@ export default function Produk() {
 
     return (
         <AdminLayout title="Produk">
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white rounded-xl shadow-sm p-6 mb-6">
-                <div className="mb-4 lg:mb-0">
+            <div className="flex flex-col lg:flex-row justify-between lg:items-center bg-white rounded-xl shadow-sm p-6 mb-6 gap-4">
+                <div>
                     <h1 className="text-2xl font-bold text-gray-800">Kelola Produk</h1>
-                    <p className="text-gray-600">Daftar produk yang tersedia di sistem</p>
+                    <p className="text-gray-600">Daftar Produk yang tersedia di sistem</p>
                     {error && <p className="text-red-500 mt-1">{error}</p>}
                 </div>
-                <div className="text-gray-700 text-right text-sm lg:text-base flex flex-col">
+
+                <div className="text-gray-700 text-sm lg:text-base flex flex-col text-left lg:text-right">
                     <span className="font-medium text-2xl text-blue-700">{products.length}</span>
                     <span>Produk tersedia</span>
                 </div>
@@ -165,8 +166,11 @@ export default function Produk() {
                 </div>
 
                 {/* Search & Filter */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-3 md:space-y-0">
-                    <div className="flex space-x-3 w-full md:w-auto">
+                <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
+
+                    {/* Left Controls */}
+                    <div className="flex flex-col md:flex-row w-full md:w-auto gap-3">
+
                         {/* Search */}
                         <div className="relative w-full md:w-64">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -174,41 +178,47 @@ export default function Produk() {
                             </div>
                             <input
                                 type="text"
-                                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Cari produk..."
                                 value={searchTerm}
                                 onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                             />
                             {searchTerm && (
-                                <button onClick={() => { setSearchTerm(""); setCurrentPage(1); }} className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer">
+                                <button
+                                    onClick={() => { setSearchTerm(""); setCurrentPage(1); }}
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                >
                                     <RefreshCcw className="h-5 w-5 text-gray-400" />
                                 </button>
                             )}
                         </div>
 
                         {/* Filter kategori */}
-                        <div>
-                            <select
-                                className="border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                value={filterCategoryId}
-                                onChange={(e) => { setFilterCategoryId(Number(e.target.value)); setCurrentPage(1); }}
-                            >
-                                <option value="">Semua Kategori</option>
-                                {categories.map(c => <option key={c.id} value={c.id}>{c.category_name}</option>)}
-                            </select>
-                        </div>
+                        <select
+                            className="border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={filterCategoryId}
+                            onChange={(e) => { setFilterCategoryId(Number(e.target.value)); setCurrentPage(1); }}
+                        >
+                            <option value="">Semua Kategori</option>
+                            {categories.map(c => (
+                                <option key={c.id} value={c.id}>
+                                    {c.category_name}
+                                </option>
+                            ))}
+                        </select>
 
                         {/* Tombol Reset */}
                         <button
                             onClick={() => { setSearchTerm(""); setFilterCategoryId(""); setCurrentPage(1); }}
-                            className="px-4 py-3 rounded-lg border border-gray-500 hover:bg-gray-300 text-sm font-medium text-blue-700 flex items-center"
+                            className="px-4 py-2 rounded-lg border border-gray-500 hover:bg-gray-300 text-sm font-medium text-blue-700 flex items-center justify-center"
                         >
                             <RefreshCcw className="h-4 w-4 mr-2" />
-                            <span>Reset</span>
+                            Reset
                         </button>
                     </div>
 
-                    <div className="text-sm text-gray-500">
+                    {/* Right Text */}
+                    <div className="text-sm text-gray-500 text-left md:text-right">
                         Menampilkan {currentProducts.length} dari {filteredProducts.length} produk
                     </div>
                 </div>

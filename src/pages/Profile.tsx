@@ -24,7 +24,6 @@ export default function Profile() {
     const [loading, setLoading] = useState<boolean>(true);
     const [msg, setMsg] = useState<string>("");
     const [isUpdating, setIsUpdating] = useState<boolean>(false);
-    const { updateUser } = useAuth();
 
     const [form, setForm] = useState<ProfileForm>({
         name: "",
@@ -74,11 +73,6 @@ export default function Profile() {
 
         try {
             const response = await api.put("/admin/update", payload);
-            const updated = response.data.data;
-            updateUser({
-                name: updated.user_name,
-                email: updated.email,
-            });
 
             setMsg("Berhasil update data!");
             setForm(prev => ({ ...prev, password: "" }));

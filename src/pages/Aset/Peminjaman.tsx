@@ -243,13 +243,14 @@ export default function PeminjamanAdmin() {
     return (
         <AdminLayout title="Peminjaman">
             {/* Header */}
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white rounded-xl shadow-sm p-6 mb-6">
-                <div className="mb-4 lg:mb-0">
+            <div className="flex flex-col lg:flex-row justify-between lg:items-center bg-white rounded-xl shadow-sm p-6 mb-6 gap-4">
+                <div>
                     <h1 className="text-2xl font-bold text-gray-800">Kelola Peminjaman</h1>
                     <p className="text-gray-600">Daftar semua peminjaman di sistem</p>
                     {error && <p className="text-red-500 mt-1">{error}</p>}
                 </div>
-                <div className="text-gray-700 text-right text-sm lg:text-base flex flex-col">
+
+                <div className="text-gray-700 text-sm lg:text-base flex flex-col text-left lg:text-right">
                     <span className="font-medium text-2xl text-blue-700">{peminjaman.length}</span>
                     <span>Peminjaman tersedia</span>
                 </div>
@@ -270,15 +271,16 @@ export default function PeminjamanAdmin() {
                 </div>
 
                 {/* Search & Filters */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-2 md:space-y-0 md:space-x-4">
+                <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+
                     {/* Search */}
-                    <div className="relative w-full md:w-64">
+                    <div className="w-full md:w-64 relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <Search className="h-5 w-5 text-gray-400" />
                         </div>
                         <input
                             type="text"
-                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Cari user/produk..."
                             value={search}
                             onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
@@ -286,7 +288,7 @@ export default function PeminjamanAdmin() {
                         {search && (
                             <button
                                 onClick={() => { setSearch(""); setCurrentPage(1); }}
-                                className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center"
                             >
                                 <RefreshCcw className="h-5 w-5 text-gray-400" />
                             </button>
@@ -294,64 +296,74 @@ export default function PeminjamanAdmin() {
                     </div>
 
                     {/* Filters */}
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-3 w-full md:w-auto">
                         <input
                             type="date"
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
-                            className="border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
+
                         <select
                             value={status}
                             onChange={(e) => setStatus(e.target.value)}
-                            className="border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">Semua status</option>
                             <option value="dipinjam">Dipinjam</option>
                             <option value="dikembalikan">Dikembalikan</option>
                         </select>
+
                         <select
                             value={productId}
                             onChange={(e) => setProductId(Number(e.target.value))}
-                            className="border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">Semua produk</option>
                             {products.map((p) => (
-                                <option key={p.id} value={p.id}>{p.product_name}</option>
+                                <option key={p.id} value={p.id}>
+                                    {p.product_name}
+                                </option>
                             ))}
                         </select>
+
                         <select
                             value={locationId}
                             onChange={(e) => setLocationId(Number(e.target.value))}
-                            className="border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">Semua lokasi</option>
                             {locations.map((l) => (
-                                <option key={l.id} value={l.id}>{l.location_name}</option>
+                                <option key={l.id} value={l.id}>
+                                    {l.location_name}
+                                </option>
                             ))}
                         </select>
                     </div>
 
-                    {/* Reset Search & Filter */}
-                    <button
-                        onClick={() => {
-                            setSearch("");
-                            setDate("");
-                            setStatus("");
-                            setProductId("");
-                            setLocationId("");
-                            setCurrentPage(1);
-                        }}
-                        className="px-4 py-3 rounded-lg border border-gray-500 hover:bg-gray-300 text-sm font-medium text-blue-700 flex items-center"
-                    >
-                        <RefreshCcw className="h-4 w-4 mr-2" />
-                        <span>Reset</span>
-                    </button>
+                    {/* Reset Button */}
+                    <div className="flex md:block">
+                        <button
+                            onClick={() => {
+                                setSearch("");
+                                setDate("");
+                                setStatus("");
+                                setProductId("");
+                                setLocationId("");
+                                setCurrentPage(1);
+                            }}
+                            className="px-4 py-2 rounded-lg border border-gray-500 hover:bg-gray-200 text-sm font-medium text-blue-700 flex items-center justify-center w-full md:w-auto"
+                        >
+                            <RefreshCcw className="h-4 w-4 mr-2" />
+                            Reset
+                        </button>
+                    </div>
 
                     {/* Info jumlah */}
-                    <div className="text-sm text-gray-500 md:ml-auto">
+                    <div className="text-sm text-gray-500 md:ml-auto md:text-right">
                         Menampilkan {currentItems.length} dari {filteredPeminjaman.length} peminjaman
                     </div>
+
                 </div>
 
                 {/* Table */}
