@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
 import Modal from "../../components/Modal";
 import api, { setAuthToken } from "../../api";
-import { CircleAlert, Plus, RefreshCcw, Search, SquarePen, Trash2 } from "lucide-react";
+import { CheckCircle, CircleAlert, FileText, GraduationCap, Phone, Plus, RefreshCcw, Search, SquarePen, Trash2, User2 } from "lucide-react";
 
 interface User {
     id: number;
@@ -37,6 +37,10 @@ export default function User() {
 
     const [filterRoleId, setFilterRoleId] = useState<number | "all">("all");
 
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [detailData, setDetailData] = useState<any>(null);
+    const [detailLoading, setDetailLoading] = useState(false);
+
     // Ambil roles
     const fetchRoles = async () => {
         try {
@@ -64,6 +68,26 @@ export default function User() {
             setLoading(false);
         }
     };
+
+    const fetchUserDetail = async (user: User) => {
+        setDetailLoading(true);
+        try {
+            let res;
+            if (user.role?.role_name.toLowerCase() === "admin") {
+                res = await api.get(`/admin/${user.id}/detail`);
+            } else {
+                res = await api.get(`/admin/${user.id}/detail`); // tetap ke endpoint yang sama
+            }
+            setDetailData(res.data.data);
+            setIsDetailModalOpen(true);
+        } catch (err: any) {
+            console.error(err);
+            alert("Gagal mengambil detail user");
+        } finally {
+            setDetailLoading(false);
+        }
+    };
+
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -289,6 +313,12 @@ export default function User() {
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <div className="flex justify-end space-x-2">
                                                     <button
+                                                        onClick={() => fetchUserDetail(user)}
+                                                        className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md text-sm flex items-center"
+                                                    >
+                                                        <CircleAlert className="w-4 h-4 mr-1" /> Detail
+                                                    </button>
+                                                    <button
                                                         onClick={() => openModal(user)}
                                                         className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-md text-sm flex items-center"
                                                     >
@@ -386,6 +416,113 @@ export default function User() {
                         <button onClick={handleSave} className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">Simpan</button>
                     </div>
                 </div>
+            </Modal>
+
+            <Modal
+                isOpen={isDetailModalOpen}
+                title="Detail Pengguna"
+                onClose={() => setIsDetailModalOpen(false)}
+            >
+                {detailLoading ? (
+                    <div className="flex flex-col items-center justify-center py-12 space-y-3">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                        <p className="text-gray-500 text-sm">Memuat detail pengguna...</p>
+                    </div>
+                ) : detailData ? (
+                    <div className="space-y-6 p-1">
+                        {/* Header */}
+                        <div className="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                            <div className="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-600 rounded-full">
+                                <User2 className="h-6 w-6" />
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-lg text-gray-800">{detailData.user_name}</h3>
+                                <p className="text-gray-600">{detailData.email}</p>
+                            </div>
+                            <div className="ml-auto">
+                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${detailData.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'}`}>
+                                    {detailData.role}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Grid informasi */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Kontak */}
+                            {detailData.phone || detailData.identity_number ? (
+                                <div className="space-y-4">
+                                    <h4 className="font-medium text-gray-700 border-b pb-2">Informasi Kontak</h4>
+                                    {detailData.phone && (
+                                        <div className="flex items-start space-x-3">
+                                            <Phone className="w-5 h-5 text-gray-400 mt-0.5" />
+                                            <div>
+                                                <p className="text-gray-500 text-sm">Telepon</p>
+                                                <p className="font-medium text-gray-800">{detailData.phone}</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {detailData.identity_number && (
+                                        <div className="flex items-start space-x-3">
+                                            <FileText className="w-5 h-5 text-gray-400 mt-0.5" />
+                                            <div>
+                                                <p className="text-gray-500 text-sm">Nomor Identitas</p>
+                                                <p className="font-medium text-gray-800">{detailData.identity_number}</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-center text-gray-500">
+                                    <p>Tidak ada informasi kontak tersedia.</p>
+                                </div>
+                            )}
+
+                            {/* Akademik */}
+                            {detailData.class || detailData.major || detailData.status ? (
+                                <div className="space-y-4">
+                                    <h4 className="font-medium text-gray-700 border-b pb-2">Informasi Akademik</h4>
+                                    {detailData.class && (
+                                        <div className="flex items-start space-x-3">
+                                            <GraduationCap className="w-5 h-5 text-gray-400 mt-0.5" />
+                                            <div>
+                                                <p className="text-gray-500 text-sm">Kelas</p>
+                                                <p className="font-medium text-gray-800">{detailData.class}</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {detailData.major && (
+                                        <div className="flex items-start space-x-3">
+                                            <GraduationCap className="w-5 h-5 text-gray-400 mt-0.5" />
+                                            <div>
+                                                <p className="text-gray-500 text-sm">Jurusan</p>
+                                                <p className="font-medium text-gray-800">{detailData.major}</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {detailData.status && (
+                                        <div className="flex items-start space-x-3">
+                                            <CheckCircle className="w-5 h-5 text-gray-400 mt-0.5" />
+                                            <div>
+                                                <p className="text-gray-500 text-sm">Status</p>
+                                                <p className="font-medium text-gray-800">{detailData.status}</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-center text-gray-500">
+                                    <p>Tidak ada informasi akademik tersedia.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="flex flex-col items-center justify-center py-10 text-gray-500">
+                        <User2 className="h-12 w-12 mb-3" />
+                        <p className="text-lg font-medium">Tidak ada detail tersedia</p>
+                        <p className="text-sm mt-1">Data pengguna tidak dapat ditemukan</p>
+                    </div>
+                )}
             </Modal>
         </AdminLayout>
     );
