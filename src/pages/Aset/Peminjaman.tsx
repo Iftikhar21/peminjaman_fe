@@ -64,11 +64,12 @@ export default function PeminjamanAdmin() {
             if (token) setAuthToken(token);
 
             const [prodRes, locRes] = await Promise.all([
-                api.get("/product"),
-                api.get("/location"),
+                api.get("/product/"),
+                api.get("/location/"),
             ]);
 
             setProducts(prodRes.data.data);
+            console.log("Products fetched:", prodRes.data.data);
             setLocations(locRes.data.data);
         } catch (err) {
             console.error(err);
@@ -85,7 +86,7 @@ export default function PeminjamanAdmin() {
         const date = new Date(dateString);
         return date.toLocaleDateString('id-ID', {
             day: '2-digit',
-            month: '2-digit',
+            month: 'long', // 'long' supaya tampil "November"
             year: 'numeric'
         });
     };
@@ -229,7 +230,7 @@ export default function PeminjamanAdmin() {
         const matchLocation = locationId ? p.location.id === locationId : true;
         const matchStatus = status ? p.status === status : true;
         const matchDate = date
-            ? new Date(p.start_date) <= new Date(date) && new Date(p.end_date) >= new Date(date)
+            ? p.start_date.slice(0, 10) <= date && p.end_date.slice(0, 10) >= date
             : true;
 
         return matchSearch && matchProduct && matchLocation && matchStatus && matchDate;
@@ -271,99 +272,127 @@ export default function PeminjamanAdmin() {
                 </div>
 
                 {/* Search & Filters */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-
-                    {/* Search */}
-                    <div className="w-full md:w-64 relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Search className="h-5 w-5 text-gray-400" />
+                <div className="flex flex-col gap-4 mb-6">
+                    {/* Top Section: Search & Reset */}
+                    <div className="flex flex-col sm:flex-row gap-3 w-full">
+                        {/* Search */}
+                        <div className="w-full sm:flex-1 sm:max-w-xs relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+                            </div>
+                            <input
+                                type="text"
+                                className="block w-full pl-9 sm:pl-10 pr-8 sm:pr-10 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Cari user/produk..."
+                                value={search}
+                                onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+                            />
+                            {search && (
+                                <button
+                                    onClick={() => { setSearch(""); setCurrentPage(1); }}
+                                    className="absolute inset-y-0 right-0 pr-2 sm:pr-3 flex items-center"
+                                >
+                                    <RefreshCcw className="h-4 w-4 text-gray-400" />
+                                </button>
+                            )}
                         </div>
-                        <input
-                            type="text"
-                            className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Cari user/produk..."
-                            value={search}
-                            onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-                        />
-                        {search && (
+
+                        {/* Reset Button - Mobile */}
+                        <div className="sm:hidden w-full">
                             <button
-                                onClick={() => { setSearch(""); setCurrentPage(1); }}
-                                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                onClick={() => {
+                                    setSearch("");
+                                    setDate("");
+                                    setStatus("");
+                                    setProductId("");
+                                    setLocationId("");
+                                    setCurrentPage(1);
+                                }}
+                                className="w-full px-4 py-2 rounded-lg border border-gray-500 hover:bg-gray-200 text-sm font-medium text-blue-700 flex items-center justify-center"
                             >
-                                <RefreshCcw className="h-5 w-5 text-gray-400" />
+                                <RefreshCcw className="h-4 w-4 mr-2" />
+                                Reset Filter
                             </button>
-                        )}
+                        </div>
                     </div>
 
-                    {/* Filters */}
-                    <div className="flex flex-wrap gap-3 w-full md:w-auto">
-                        <input
-                            type="date"
-                            value={date}
-                            onChange={(e) => setDate(e.target.value)}
-                            className="border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
+                    {/* Middle Section: Filters */}
+                    <div className="flex flex-col sm:flex-row gap-3 w-full">
+                        {/* Filters Grid */}
+                        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 w-full">
+                            <input
+                                type="date"
+                                value={date}
+                                onChange={(e) => setDate(e.target.value)}
+                                className="border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm w-full"
+                            />
 
-                        <select
-                            value={status}
-                            onChange={(e) => setStatus(e.target.value)}
-                            className="border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value="">Semua status</option>
-                            <option value="dipinjam">Dipinjam</option>
-                            <option value="dikembalikan">Dikembalikan</option>
-                        </select>
+                            <select
+                                value={status}
+                                onChange={(e) => setStatus(e.target.value)}
+                                className="border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm w-full"
+                            >
+                                <option value="">Semua status</option>
+                                <option value="dipinjam">Dipinjam</option>
+                                <option value="dikembalikan">Dikembalikan</option>
+                            </select>
 
-                        <select
-                            value={productId}
-                            onChange={(e) => setProductId(Number(e.target.value))}
-                            className="border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value="">Semua produk</option>
-                            {products.map((p) => (
-                                <option key={p.id} value={p.id}>
-                                    {p.product_name}
-                                </option>
-                            ))}
-                        </select>
+                            <select
+                                value={productId}
+                                onChange={(e) => setProductId(Number(e.target.value))}
+                                className="border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm w-full"
+                            >
+                                <option value="">Semua produk</option>
+                                {products.map((p) => (
+                                    <option key={p.id} value={p.id}>
+                                        {p.product_name}
+                                    </option>
+                                ))}
+                            </select>
 
-                        <select
-                            value={locationId}
-                            onChange={(e) => setLocationId(Number(e.target.value))}
-                            className="border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value="">Semua lokasi</option>
-                            {locations.map((l) => (
-                                <option key={l.id} value={l.id}>
-                                    {l.location_name}
-                                </option>
-                            ))}
-                        </select>
+                            <select
+                                value={locationId}
+                                onChange={(e) => setLocationId(Number(e.target.value))}
+                                className="border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm w-full"
+                            >
+                                <option value="">Semua lokasi</option>
+                                {locations.map((l) => (
+                                    <option key={l.id} value={l.id}>
+                                        {l.location_name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Reset Button - Desktop */}
+                        <div className="hidden sm:flex sm:items-start">
+                            <button
+                                onClick={() => {
+                                    setSearch("");
+                                    setDate("");
+                                    setStatus("");
+                                    setProductId("");
+                                    setLocationId("");
+                                    setCurrentPage(1);
+                                }}
+                                className="px-4 py-2 rounded-lg border border-gray-500 hover:bg-gray-200 text-sm font-medium text-blue-700 flex items-center justify-center whitespace-nowrap"
+                            >
+                                <RefreshCcw className="h-4 w-4 mr-2" />
+                                Reset
+                            </button>
+                        </div>
                     </div>
 
-                    {/* Reset Button */}
-                    <div className="flex md:block">
-                        <button
-                            onClick={() => {
-                                setSearch("");
-                                setDate("");
-                                setStatus("");
-                                setProductId("");
-                                setLocationId("");
-                                setCurrentPage(1);
-                            }}
-                            className="px-4 py-2 rounded-lg border border-gray-500 hover:bg-gray-200 text-sm font-medium text-blue-700 flex items-center justify-center w-full md:w-auto"
-                        >
-                            <RefreshCcw className="h-4 w-4 mr-2" />
-                            Reset
-                        </button>
-                    </div>
+                    {/* Bottom Section: Info & Pagination */}
+                    <div className="flex flex-col xs:flex-row justify-between items-start xs:items-center gap-2 w-full">
+                        {/* Info Jumlah */}
+                        <div className="text-xs sm:text-sm text-gray-500 w-full xs:w-auto">
+                            Menampilkan <span className="font-medium">{currentItems.length}</span> dari{" "}
+                            <span className="font-medium">{filteredPeminjaman.length}</span> peminjaman
+                        </div>
 
-                    {/* Info jumlah */}
-                    <div className="text-sm text-gray-500 md:ml-auto md:text-right">
-                        Menampilkan {currentItems.length} dari {filteredPeminjaman.length} peminjaman
+                        {/* Optional: Additional controls can go here */}
                     </div>
-
                 </div>
 
                 {/* Table */}
@@ -404,8 +433,8 @@ export default function PeminjamanAdmin() {
                                             <td className="px-6 py-4 whitespace-nowrap">{p.product.product_name}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">{p.location.location_name}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">{p.qty}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">{p.start_date}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">{p.end_date}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{formatDate(p.start_date)}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{formatDate(p.end_date)}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span
                                                     className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full capitalize ${p.status === "dipinjam"
