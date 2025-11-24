@@ -117,8 +117,8 @@ export default function Kategori() {
         <AdminLayout title="Kategori">
             <div className="flex flex-col lg:flex-row justify-between lg:items-center bg-white rounded-xl shadow-sm p-6 mb-6 gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800">Kelola Kategori</h1>
-                    <p className="text-gray-600">Daftar Kategori yang tersedia di sistem</p>
+                    <h1 className="text-2xl font-bold text-gray-800">Kelola Kategori Produk</h1>
+                    <p className="text-gray-600">Daftar Kategori produk yang tersedia di sistem</p>
                     {error && <p className="text-red-500 mt-1">{error}</p>}
                 </div>
 
@@ -135,7 +135,7 @@ export default function Kategori() {
                         className="bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center shadow-sm cursor-pointer"
                     >
                         <Plus className="mr-2" />
-                        Tambah Kategori
+                        Tambah Kategori Produk
                     </button>
                 </div>
                 {/* Search and Stats Bar */}
